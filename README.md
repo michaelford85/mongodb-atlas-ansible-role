@@ -1,5 +1,5 @@
 
-# Ansible Terraform MongoDB Atlas
+# MongoDB Atlas Ansible Role
 
 This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision MongoDB Atlas clusters.
 
