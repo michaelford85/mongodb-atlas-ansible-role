@@ -62,13 +62,44 @@ db_user:
 ---
 
 ### 4. Run the playbook
-```bash
-ansible-playbook create-atlas-cluster.yml
+
+Here are some example playbooks for managing your Atlas cluster.
+
+#### Create the MongoDB Atlas Cluster
+```
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - ansible.builtin.include_role:
+        name: terraform
+        tasks_from: create-atlas-cluster
 ```
 
-The playbook will:
-1. Render the Terraform templates with your variables.
-2. Initialize and apply Terraform to create the MongoDB Atlas cluster.
+This playbook will:
+- Render the Terraform templates with your variables.
+- Initialize and apply Terraform to create the MongoDB Atlas cluster.
+
+#### Destroy the MongoDB Atlas Cluster
+```
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - ansible.builtin.include_role:
+        name: terraform
+        tasks_from: destroy-atlas-cluster
+```
+
+#### Remove the local terraform artifacts
+```
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - ansible.builtin.include_role:
+        name: terraform
+        tasks_from: remove-terraform-artifacts
+```
+
+
 
 ---
 
