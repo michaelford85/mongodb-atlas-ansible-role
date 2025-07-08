@@ -62,28 +62,35 @@ ansible-galaxy collection install community.general:10.0.0
 ansible-galaxy collection install ansible.posix:2.0.0
 ```
 
-ansible-galaxy collection install community.mysql.
 ---
 
 ### 3. Define your variables
 Edit your `group_vars` or `vars` file with required parameters:
 
 ```yaml
-atlas_project_id: "YOUR_PROJECT_ID"
-cluster_name: "test-cluster"
-provider_name: "AWS"
-region_name: "US_EAST_1"
-cluster_instance_size: "M10"
-ip_whitelist:
-  - "0.0.0.0/0"
+## The value of the `Organization ID` field in the Organization Settings GUI page in
+## MongoDB Atlas. This represents the existing Atlas Organization that the Project is a part of.
+atlas_org_id: 1234567890abcdef12345678
 
-db_user:
-  username: "app_user"
-  password: "securepassword"
-  database_name: "app_db"
-  roles:
-    - roleName: "readWrite"
-      databaseName: "app_db"
+## The atlas_project_name is the name in the `Project Name` field when looking at the
+## Project Settings GUI page in MongoDB Atlas. If there are spaces in the name, use quotes
+## when populating this variable. 
+atlas_project_name: "Test Project"
+
+### The atlas_project_name is the name in the `Project ID` field when looking at the
+## Project Settings GUI page in MongoDB Atlas.
+atlas_project_id: 1234567890abcdef12345679
+
+## This is the the desired name of the cluster, and will also be incorporated into the
+## database access usernames that will be generated.
+atlas_cluster_name: test-cluster
+
+## The desired instance type of replica set members in your cluster
+## It can range from M10 to M80.
+atlas_cluster_instance_size: M10
+
+## The password that will be assigned to all database access users that are generated.
+db_password: "SuperSecurePassword123!"
 ```
 
 ---
@@ -132,18 +139,20 @@ This playbook will:
 
 ## 📂 Repository structure
 ```
-.
-├── roles/
-│   └── terraform/
-│       ├── tasks/
-│       │   └── main.yml
-│       └── templates/
-│           ├── main.tf.j2
-│           └── terraform.tfvars.j2
+mongodb-atlas-ansible-role/
+├── defaults/
+├── handlers/
+├── meta/
+├── tasks/
+│   ├── create-atlas-cluster.yml
+│   ├── destroy-atlas-cluster.yml
+│   ├── main.yml
+│   └── remove-terraform-artifacts.yml
+├── tests/
 ├── vars/
 │   └── main.yml
-├── create-atlas-cluster.yml
-└── README.md
+├── README.md
+└── requirements.yml
 ```
 
 ---
