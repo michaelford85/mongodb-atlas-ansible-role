@@ -26,16 +26,43 @@ cd ansible-terraform-mongodb-atlas
 ```
 
 ### 2. Install requirements
+
+#### Programs and Packages 
 Make sure you have:
 - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Terraform](https://developer.hashicorp.com/terraform/install)
 - Python packages for Ansible collections if required.
 
-You can install collections (example):
-```bash
-ansible-galaxy collection install community.general
+#### Install Ansible Collections
+
+##### Via the requirements.yml file
+If you have only installed ansible-core, be sure to require the following collections in your `requirements.yml` file in the same directory as your playbook:
+
+```
+# requirements.yml
+collections:
+  - name: community.mongodb
+    version: 1.7.10
+  - name: community.general
+    version: 11.0.0
+  - name: ansible.posix
+    version: 2.0.0
 ```
 
+You can then run the following command:
+`ansible-galaxy collection install -r requirements.yml`
+
+##### Individual collection installation
+
+Alternatively, you install them manually with the following commands:
+
+```
+ansible-galaxy collection install community.mongodb:1.7.10
+ansible-galaxy collection install community.general:10.0.0
+ansible-galaxy collection install ansible.posix:2.0.0
+```
+
+ansible-galaxy collection install community.mysql.
 ---
 
 ### 3. Define your variables
