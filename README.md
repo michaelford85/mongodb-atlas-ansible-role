@@ -16,6 +16,30 @@ It enables you to use Ansible variables to control your MongoDB Atlas infrastruc
 
 ---
 
+## 📂 Role Repository Structure
+```
+mongodb-atlas-ansible-role/
+├── defaults/
+│   └── main.yml
+├── handlers/
+├── meta/
+├── tasks/
+│   ├── create-atlas-cluster.yml
+│   ├── destroy-atlas-cluster.yml
+│   ├── main.yml
+│   └── remove-terraform-artifacts.yml
+├── templates/
+│   ├── main.tf,j2
+│   ├── providers.tf.j2
+│   └── vars.tf.j2
+├── tests/
+├── vars/
+├── README.md
+└── requirements.yml
+```
+
+---
+
 ## ✅ MongoDB Atlas Requirements
 
 - **Existing Atlas project:**  
@@ -121,9 +145,74 @@ vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
 
 ### 3. Run the playbook
 
-Here are some example playbooks for managing your Atlas cluster.
+After installing the role and other prerequisites, author a playbook in order to create/destroy your cluster. Below you will find an example directory with files and playbooks to run.
 
-#### Create the MongoDB Atlas Cluster
+#### 📂 Playbook Repository Structure
+```
+atlas-orchestrator/
+├── credentials/
+│   └── atlas_creds.yml
+├── ansible.cfg
+├── create_cluster.yml
+├── destroy_cluster.yml
+├── remove_tf_artifacts.yml
+├── inventory
+└── requirements.yml
+```
+
+##### atlas_creds.yml
+
+This file will hold your Atlas API keys and database user password. Use [Ansible vault](https://docs.ansible.com/ansible/latest/vault_guide/index.html) to encrypt this file for safe keeping.
+
+```
+---
+vaulted_atlas_public_key: "abcd1234efgh5678ijkl"
+vaulted_atlas_private_key: "mnop9012qrst3456uvwx7890yzab1234"
+vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
+```
+
+##### inventory
+
+An inventory file that defines the hosts Ansible will manage. In this example, it simply points to `localhost` using a local connection, since all operations (templating, Terraform, API calls) are executed from your local machine.
+
+```
+localhost ansible_connection=local
+```
+
+##### requirements.yml
+
+Specifies the Ansible collections required by this project, ensuring all necessary modules and plugins are available. Install these dependencies with `ansible-galaxy collection install -r requirements.yml`.
+```
+roles:
+  - name: mongodb-atlas-ansible-role
+    src: git+https://github.com/michaelford85/mongodb-atlas-ansible-role.git
+collections:
+  - name: community.mongodb
+    version: 1.7.10
+  - name: community.general
+    version: 11.0.0
+  - name: ansible.posix
+    version: 2.0.0
+```
+
+##### ansible.cfg
+
+Configuration file for Ansible. In this example, it specifies where to find your inventory file, sets the location of your roles and collections directories (so Ansible can discover them locally), and adjusts SSH connection settings and timeouts for more robust runs.
+
+```
+[defaults]
+inventory      = inventory
+forks          = 50
+host_key_checking = False
+roles_path = ./roles
+collections_path = ./collections
+
+[persistent_connection]
+command_timeout = 200
+connect_timeout = 200
+```
+
+##### create_cluster.yml
 ```
 - hosts: localhost
   gather_facts: no
@@ -139,7 +228,7 @@ Here are some example playbooks for managing your Atlas cluster.
   #  - vaulted_atlas_private_key
   #  - vaulted_db_password
   vars_files:
-    - atlas_creds.yml
+    - credentials/atlas_creds.yml
 
   tasks:
     - ansible.builtin.include_role:
@@ -151,7 +240,7 @@ This playbook will:
 - Render the Terraform templates with your variables.
 - Initialize and apply Terraform to create the MongoDB Atlas cluster.
 
-#### Destroy the MongoDB Atlas Cluster
+##### destroy_cluster.yml
 ```
 - hosts: localhost
   gather_facts: no
@@ -165,7 +254,7 @@ This playbook will:
   #  - vaulted_atlas_public_key
   #  - vaulted_atlas_private_key
   vars_files:
-    - atlas_creds.yml
+    - credentials/atlas_creds.yml
 
   tasks:
     - ansible.builtin.include_role:
@@ -173,7 +262,7 @@ This playbook will:
         tasks_from: destroy-atlas-cluster
 ```
 
-#### Remove the local terraform artifacts
+##### remove_tf_artifacts.yml
 ```
 - hosts: localhost
   gather_facts: no
@@ -186,39 +275,48 @@ This playbook will:
         tasks_from: remove-terraform-artifacts
 ```
 
+#### Playbook Commands:
 
-
----
-
-## 📂 Repository structure
-```
-mongodb-atlas-ansible-role/
-├── defaults/
-├── handlers/
-├── meta/
-├── tasks/
-│   ├── create-atlas-cluster.yml
-│   ├── destroy-atlas-cluster.yml
-│   ├── main.yml
-│   └── remove-terraform-artifacts.yml
-├── tests/
-├── vars/
-│   └── main.yml
-├── README.md
-└── requirements.yml
+##### Create the cluster
+```bash
+ansible-playbook create_cluster.yml
 ```
 
+If your `atlas_creds.yml` is encrypted with Ansible Vault, include the `--vault-id` flag:
+
+```bash
+ansible-playbook create_cluster.yml --vault-id @prompt
+```
+
+##### Destroy the cluster
+```bash
+ansible-playbook destroy_cluster.yml
+```
+
+If your `atlas_creds.yml` is encrypted:
+
+```bash
+ansible-playbook destroy_cluster.yml --vault-id @prompt
+```
+
+##### Remove local Terraform artifacts
+```bash
+ansible-playbook remove-tf-artifacts.yml
+```
 ---
 
 ## 🚧 Future enhancements
-- Support for additional MongoDB Atlas resources (projects, alert configurations, etc.)
-- Automated destroy playbook to clean up infrastructure.
-- Molecule tests for Ansible role.
 
----
+- Add support for **conditionally creating database users**, allowing users to skip default user creation if not needed.
+- Provide the ability to deploy **free tier clusters** (M0) or select higher-tier configurations based on use case.
+- Expand cluster customization options, enabling users to fully define their MongoDB Atlas cluster via Ansible variables and Terraform, including but not limited to:
+  - Choice of **cloud provider** (AWS, Azure, GCP).
+  - Configuration of **number of electable nodes** and **number of read-only nodes** for advanced replication setups.
+  - Enable or disable **cloud backup** and **continuous cloud backup** options.
+  - Support for **sharded cluster deployments**, including setting number of shards and configuration servers.
+  - Ability to set **cluster tags** for organizational or billing purposes.
 
-## 📜 License
-MIT
+The goal is to allow this role to act as a comprehensive interface for creating any MongoDB Atlas cluster configuration supported by the Terraform provider, fully managed through Ansible variables.
 
 ---
 
@@ -228,72 +326,6 @@ PRs and issues are welcome! Please open an issue first to discuss changes or new
 ---
 
 ## 📬 Contact
-Created by [Your Name](https://github.com/yourusername) - feel free to reach out!
+Created by [Michael Ford](https://github.com/michaelford85) - feel free to reach out!
 
 ---
-
-## ✍️ Example Jinja2 templates
-
-### `main.tf.j2`
-```jinja
-terraform {
-  required_providers {
-    mongodbatlas = {
-      source  = "mongodb/mongodbatlas"
-      version = "~> 1.9.0"
-    }
-  }
-}
-
-provider "mongodbatlas" {
-  public_key  = var.atlas_public_key
-  private_key = var.atlas_private_key
-}
-
-resource "mongodbatlas_cluster" "cluster" {
-  project_id   = var.atlas_project_id
-  name         = var.cluster_name
-  cluster_type = "REPLICASET"
-
-  provider_name = var.provider_name
-  provider_region_name = var.region_name
-  provider_instance_size_name = var.cluster_instance_size
-}
-
-resource "mongodbatlas_database_user" "db_user" {
-  username = var.db_username
-  password = var.db_password
-  project_id = var.atlas_project_id
-  roles {
-    role_name     = var.db_role_name
-    database_name = var.db_database_name
-  }
-}
-
-resource "mongodbatlas_project_ip_whitelist" "ips" {
-  count      = length(var.ip_whitelist)
-  project_id = var.atlas_project_id
-  cidr_block = element(var.ip_whitelist, count.index)
-}
-```
-
----
-
-### `terraform.tfvars.j2`
-```jinja
-atlas_project_id       = "{{ atlas_project_id }}"
-cluster_name           = "{{ cluster_name }}"
-provider_name          = "{{ provider_name }}"
-region_name            = "{{ region_name }}"
-cluster_instance_size  = "{{ cluster_instance_size }}"
-
-db_username            = "{{ db_user.username }}"
-db_password            = "{{ db_user.password }}"
-db_database_name       = "{{ db_user.database_name }}"
-db_role_name           = "{{ db_user.roles[0].roleName }}"
-
-ip_whitelist           = [ {% for ip in ip_whitelist %}"{{ ip }}"{% if not loop.last %}, {% endif %}{% endfor %} ]
-
-atlas_public_key       = "{{ atlas_public_key }}"
-atlas_private_key      = "{{ atlas_private_key }}"
-```
