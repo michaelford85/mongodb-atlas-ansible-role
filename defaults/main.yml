@@ -29,6 +29,10 @@ mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
 ## database access usernames that will be generated.
 atlas_cluster_name: ttest-cluster
 
+## Set to true to deploy an M0 free cluster. 
+## This will automatically override the instance size to M0 and ignore other advanced cluster settings.
+## The role includes a safeguard that checks if an M0 already exists in the project and fails early if so.
+deploy_free_cluster: false
 ## The desired instance type of replica set members in your cluster
 ## It can range from M10 to M80.
 atlas_cluster_instance_size: M10

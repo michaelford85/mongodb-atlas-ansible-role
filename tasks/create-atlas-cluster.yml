@@ -1,5 +1,28 @@
 ---
 
+- name: Get all clusters in the Atlas project
+  ansible.builtin.uri:
+    url: "https://cloud.mongodb.com/api/atlas/v1.0/groups/{{ atlas_project_id }}/clusters"
+    method: GET
+    user: "{{ vaulted_atlas_public_key }}"
+    password: "{{ vaulted_atlas_private_key }}"
+    force_basic_auth: no
+    status_code: 200
+    return_content: yes
+    headers:
+      Accept: "application/json"
+  register: atlas_clusters
+
+# - ansible.builtin.debug:
+#     var: atlas_clusters 
+
+- name: Fail if an M0 cluster already exists and we're trying to deploy another free cluster
+  ansible.builtin.fail:
+    msg: "Cannot create another M0 free cluster. Atlas only allows one M0 cluster per project."
+  when: >
+    deploy_free_cluster | bool and
+    atlas_clusters.json.results | selectattr('providerSettings.instanceSizeName', 'equalto', 'M0') | list | length > 0
+
 - name: Validate atlas_cluster_instance_size
   ansible.builtin.fail:
     msg: "atlas_cluster_instance_size must be between M10 and M80. Current value: {{ atlas_cluster_instance_size }}"

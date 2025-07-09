@@ -49,6 +49,11 @@ variable "instance_size" {
   default     = "M10"
 }
 
+variable "deploy_free_cluster" {
+  type    = bool
+  default = false
+}
+
 variable "mongo_db_major_version" {
   description = "The major version of MongoDB to use"
   type        = string
