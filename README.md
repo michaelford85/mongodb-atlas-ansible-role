@@ -1,45 +1,60 @@
 
 # MongoDB Atlas Ansible Role
 
-This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision MongoDB Atlas clusters.
+This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision and destroy MongoDB Atlas clusters.
 
-It enables you to use Ansible variables (inventory, extra_vars, etc.) to control your MongoDB Atlas infrastructure, combining the flexibility of Ansible with the power of Terraform for managing cloud resources.
+It enables you to use Ansible variables to control your MongoDB Atlas infrastructure, combining the simplicity of Ansible with the power of Terraform for managing cloud resources.
 
 ---
 
 ## 🚀 Features
 
-- Generate Terraform `main.tf` and `terraform.tfvars` dynamically from Ansible variables.
-- Use Jinja2 templating for flexibility and reusability.
-- Supports creating MongoDB Atlas clusters with parameters like project ID, cluster specs, database users, and IP access lists.
-- Automate Terraform init, plan, and apply from Ansible.
-- Example inventory and variable files included.
+- Generate Terraform `main.tf`, `providers.tf`, and `vars.tf` dynamically from Ansible variables.
+  - Uses Jinja2 templating for flexibility and reusability.
+- Supports creating MongoDB Atlas clusters with selected ansible variables as described below.
+  - Automate Terraform init, plan, and apply from Ansible.
 
 ---
 
+## ✅ MongoDB Atlas Requirements
+
+- **Existing Atlas project:**  
+  - The MongoDB Atlas project must already exist. This automation does **not create the Atlas project**, only the cluster inside it. You must provide the `atlas_project_name` and `atlas_project_field` values as specified below.
+
+- **Project-level API keys:**  
+  - The API keys used must be created under the same Atlas project and have at least `Project Owner` permissions.
+    - See instructions on how to create API keys for your project [at this link](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-a-project).
+
+---
+
+## 
+
+___
+
 ## 🛠 Usage
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/yourusername/ansible-terraform-mongodb-atlas.git
-cd ansible-terraform-mongodb-atlas
-```
+### 1. Local Machine Requirements
 
-### 2. Install requirements
+#### Prerequisites 
 
-#### Programs and Packages 
-Make sure you have:
-- [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- [Terraform](https://developer.hashicorp.com/terraform/install)
+You can use this Ansible role on nearly any UNIX-like machine with Python installed. This includes Red Hat, Debian, Ubuntu, and macOS.
+
+Make sure you have the following installed:
+
+- [Ansible >= 2.9](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- [Terraform >= 1.0](https://developer.hashicorp.com/terraform/install)
 - Python packages for Ansible collections if required.
 
-#### Install Ansible Collections
+#### Install Ansible mongodb-atlas-ansible-role Role and associated Collections
 
 ##### Via the requirements.yml file
-If you have only installed ansible-core, be sure to require the following collections in your `requirements.yml` file in the same directory as your playbook:
+Be sure to require the following collections in your `requirements.yml` file in the same directory as your playbook:
 
 ```
 # requirements.yml
+roles:
+  - name: mongodb-atlas-ansible-role
+    src: git+https://github.com/michaelford85/mongodb-atlas-ansible-role.git
 collections:
   - name: community.mongodb
     version: 1.7.10
@@ -56,7 +71,8 @@ You can then run the following command:
 
 Alternatively, you install them manually with the following commands:
 
-```
+```bash
+ansible-galaxy install git+https://github.com/michaelford85/mongodb-atlas-ansible-role.git
 ansible-galaxy collection install community.mongodb:1.7.10
 ansible-galaxy collection install community.general:10.0.0
 ansible-galaxy collection install ansible.posix:2.0.0
@@ -64,7 +80,7 @@ ansible-galaxy collection install ansible.posix:2.0.0
 
 ---
 
-### 3. Define your variables
+### 2. Define your variables
 Edit your `group_vars` or `vars` file with required parameters:
 
 ```yaml
@@ -95,7 +111,7 @@ db_password: "SuperSecurePassword123!"
 
 ---
 
-### 4. Run the playbook
+### 3. Run the playbook
 
 Here are some example playbooks for managing your Atlas cluster.
 
@@ -154,13 +170,6 @@ mongodb-atlas-ansible-role/
 ├── README.md
 └── requirements.yml
 ```
-
----
-
-## ✅ Requirements
-- Ansible >= 2.9
-- Terraform >= 1.0
-- MongoDB Atlas API keys or credentials set as environment variables or in your vars.
 
 ---
 
