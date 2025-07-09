@@ -168,11 +168,15 @@ resource "mongodbatlas_project_ip_access_list" "my_ip_whitelist" {
   comment    = "Allow access from the machine running Terraform"
 }
 
-# Output MongoDB connection string
+{% if deploy_free_cluster %}
+output "mongodb_connection_string" {
+  value = mongodbatlas_cluster.cluster.connection_strings[0]
+}
+{% else %}
 output "mongodb_connection_string" {
   value = mongodbatlas_advanced_cluster.multi_cloud_cluster.connection_strings[0]
 }
-
+{% endif %}
 
 
 
