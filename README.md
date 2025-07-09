@@ -147,7 +147,7 @@ vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
 
 After installing the role and other prerequisites, author a playbook in order to create/destroy your cluster. Below you will find an example directory with files and playbooks to run.
 
-#### 📂 Playbook Repository Structure
+#### 📂 Example Playbook Repository Structure
 ```
 atlas-orchestrator/
 ├── credentials/
