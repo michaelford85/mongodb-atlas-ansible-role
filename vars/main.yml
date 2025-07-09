@@ -27,7 +27,7 @@ mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
 
 ## This is the the desired name of the cluster, and will also be incorporated into the
 ## database access usernames that will be generated.
-atlas_cluster_name: test-cluster
+atlas_cluster_name: ttest-cluster
 
 ## The desired instance type of replica set members in your cluster
 ## It can range from M10 to M80.
