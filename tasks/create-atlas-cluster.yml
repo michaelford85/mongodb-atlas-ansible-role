@@ -1,0 +1,41 @@
+---
+
+- name: Validate atlas_cluster_instance_size
+  ansible.builtin.fail:
+    msg: "atlas_cluster_instance_size must be between M10 and M80. Current value: {{ atlas_cluster_instance_size }}"
+  when: atlas_cluster_instance_size not in ["M10", "M20", "M30", "M40", "M50", "M60", "M80"]
+
+- name: Ensure Terraform cluster directory exists
+  ansible.builtin.file:
+    path: "{{ base_dir }}/{{ atlas_cluster_name }}"
+    state: directory
+    mode: '0755'
+
+- name: Render Terraform templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ base_dir }}/{{ atlas_cluster_name }}/{{ item | basename }}"
+    mode: '0644'
+  loop:
+    - templates/main.tf.j2
+    - templates/providers.tf.j2
+    - templates/vars.tf.j2
+
+# - name: Initialize Terraform
+#   ansible.builtin.command:
+#     cmd: terraform init
+#     chdir: "{{ base_dir }}/terraform/{{ atlas_cluster_name }}"
+
+# - name: Create MongoDB Atlas cluster
+#   community.general.terraform:
+#     project_path: "{{ base_dir }}/terraform/{{ atlas_cluster_name }}"
+#     state: present
+#     variables:
+#       org_id: "{{ atlas_org_id }}"
+#       mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
+#       mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
+#       project_name: "{{ atlas_project_name }}"
+#       cluster_name: "{{ atlas_cluster_name }}"
+#       instance_size: "{{ atlas_cluster_instance_size }}"
+#       db_password: "{{ db_password }}"
+#   register: terraform_output

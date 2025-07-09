@@ -1,0 +1,69 @@
+variable "mongodb_atlas_public_key" {
+  description = "MongoDB Atlas Public API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "mongodb_atlas_private_key" {
+  description = "MongoDB Atlas Private API Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "org_id" {
+  description = "MongoDB Atlas Organization ID"
+  type        = string
+}
+
+variable "project_name" {
+  description = "The name of the MongoDB Atlas project"
+  type        = string
+  default     = "my-mongodb-project"
+}
+
+/*
+variable "project_id" {
+  description = "The ID of the project in MongoDB Atlas"
+  type        = string
+}
+*/
+
+
+/*
+variable "project_owner_id" {
+  description = "The ID of the project owner for MongoDB Atlas"
+  type        = string
+}
+*/
+
+
+variable "cluster_name" {
+  description = "The name of the MongoDB Atlas cluster"
+  type        = string
+  default     = "my-global-cluster"
+}
+
+variable "instance_size" {
+  description = "The size of the MongoDB Atlas cluster instance"
+  type        = string
+  default     = "M10"
+}
+
+variable "mongo_db_major_version" {
+  description = "The major version of MongoDB to use"
+  type        = string
+  default     = "8.0"
+}
+
+variable "db_admin_name" {
+  description = "The username for the MongoDB Atlas database admin"
+  type        = string
+  default     = "db_cluster_admin"
+}
+
+variable "db_password" {
+  description = "The password for the MongoDB Atlas database admin"
+  type        = string
+  default     = "SuperSecurePassword123!"
+  sensitive   = true
+}
