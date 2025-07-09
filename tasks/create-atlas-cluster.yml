@@ -1,5 +1,20 @@
 ---
 
+- name: Get list of existing clusters in this project
+  community.mongodb.mongodb_atlas_clusters_info:
+    project_id: "{{ atlas_project_id }}"
+    api_public_key: "{{ vaulted_atlas_public_key }}"
+    api_private_key: "{{ vaulted_atlas_private_key }}"
+  register: existing_clusters
+
+- name: Fail if an M0 cluster already exists and we're trying to deploy another free cluster
+  ansible.builtin.fail:
+    msg: "Cannot create another M0 free cluster. Atlas only allows one M0 cluster per project."
+  when: >
+    deploy_free_cluster | bool and
+    existing_clusters.clusters is defined and
+    existing_clusters.clusters | selectattr('provider_instance_size_name', 'equalto', 'M0') | list | length > 0
+    
 - name: Validate atlas_cluster_instance_size
   ansible.builtin.fail:
     msg: "atlas_cluster_instance_size must be between M10 and M80. Current value: {{ atlas_cluster_instance_size }}"
