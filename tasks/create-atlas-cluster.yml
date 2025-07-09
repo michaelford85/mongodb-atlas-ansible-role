@@ -21,21 +21,21 @@
     - templates/providers.tf.j2
     - templates/vars.tf.j2
 
-# - name: Initialize Terraform
-#   ansible.builtin.command:
-#     cmd: terraform init
-#     chdir: "{{ playbook_dir }}/terraform/{{ atlas_cluster_name }}"
+- name: Initialize Terraform
+  ansible.builtin.command:
+    cmd: terraform init
+    chdir: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
 
-# - name: Create MongoDB Atlas cluster
-#   community.general.terraform:
-#     project_path: "{{ playbook_dir }}/terraform/{{ atlas_cluster_name }}"
-#     state: present
-#     variables:
-#       org_id: "{{ atlas_org_id }}"
-#       mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
-#       mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
-#       project_name: "{{ atlas_project_name }}"
-#       cluster_name: "{{ atlas_cluster_name }}"
-#       instance_size: "{{ atlas_cluster_instance_size }}"
-#       db_password: "{{ db_password }}"
-#   register: terraform_output
+- name: Create MongoDB Atlas cluster
+  community.general.terraform:
+    project_path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+    state: present
+    variables:
+      org_id: "{{ atlas_org_id }}"
+      mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
+      mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
+      project_name: "{{ atlas_project_name }}"
+      cluster_name: "{{ atlas_cluster_name }}"
+      instance_size: "{{ atlas_cluster_instance_size }}"
+      db_password: "{{ db_password }}"
+  register: terraform_output
