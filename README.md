@@ -37,7 +37,7 @@ mongodb-atlas-ansible-role/
 ├── README.md
 └── requirements.yml
 ```
-
+ 
 ---
 
 ## ✅ MongoDB Atlas Requirements
