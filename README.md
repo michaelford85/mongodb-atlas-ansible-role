@@ -135,6 +135,11 @@ atlas_cluster_name: test-cluster
 ## It can range from M10 to M80.
 atlas_cluster_instance_size: M10
 
+## Set to true to deploy an M0 free cluster. 
+## This will automatically override the instance size to M0 and ignore other advanced cluster settings.
+## The role includes a safeguard that checks if an M0 already exists in the project and fails early if so.
+deploy_free_cluster: false
+
 ## The password that will be assigned to all database access users that are generated.
 ## In practice, this should not be stored directly in a plaintext variable file. 
 ## Store it in a separate file encrypted with Ansible Vault and reference it as shown here.
@@ -146,6 +151,11 @@ vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
 ### 3. Run the playbook
 
 After installing the role and other prerequisites, author a playbook in order to create/destroy your cluster. Below you will find an example directory with files and playbooks to run.
+
+#### 🛡 Free cluster safeguard
+If `deploy_free_cluster` is set to `true`, this role automatically checks your Atlas project
+to ensure there is no existing M0 cluster. Because MongoDB Atlas only allows one M0 cluster 
+per project, this assertion will fail early with a clear error message if another M0 cluster exists.
 
 #### 📂 Example Playbook Repository Structure
 ```
@@ -224,6 +234,7 @@ connect_timeout = 200
     atlas_project_id: 1234567890abcdef12345679
     atlas_cluster_name: test-cluster
     atlas_cluster_instance_size: M10
+    deploy_free_cluster: false  # Set to true to deploy a free M0 cluster
   
   # An encrypted ansible variable file housing the variables:
   #  - vaulted_atlas_public_key
@@ -308,8 +319,7 @@ ansible-playbook remove-tf-artifacts.yml
 ## 🚧 Future enhancements
 
 - Add support for **conditionally creating database users**, allowing users to skip default user creation if not needed.
-- Provide the ability to deploy **free tier clusters** (M0) or select higher-tier configurations based on use case.
-- Expand cluster customization options, enabling users to fully define their MongoDB Atlas cluster via Ansible variables and Terraform, including but not limited to:
+- Expand cluster customization options, enabling users to fully define their MongoDB Atlas cluster via Ansible variables and Terraform, including:
   - Choice of **cloud provider** (AWS, Azure, GCP).
   - Configuration of **number of electable nodes** and **number of read-only nodes** for advanced replication setups.
   - Enable or disable **cloud backup** and **continuous cloud backup** options.
