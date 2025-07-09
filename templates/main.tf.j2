@@ -1,5 +1,7 @@
 /* MULTI-CLOUD CLUSTER */
 
+{% if not deploy_free_cluster %}
+
 data "mongodbatlas_project" "my_project" {
   name = var.project_name
 }
@@ -91,6 +93,29 @@ resource "mongodbatlas_advanced_cluster" "multi_cloud_cluster" {
     }
   }
 }
+{% else %} /* DEPLOY FREE CLUSTER */
+
+data "mongodbatlas_project" "my_project" {
+  name = var.project_name
+}
+
+output "project_id" {
+  value = data.mongodbatlas_project.my_project.id
+}
+
+# Create a Free MongoDB Atlas Cluster (M0 Tier)
+resource "mongodbatlas_cluster" "free_tier_cluster" {
+  project_id         = data.mongodbatlas_project.my_project.id
+  name               = var.cluster_name
+  provider_name      = "TENANT"
+  backing_provider_name       = "AWS"
+  cloud_backup       = false
+  provider_instance_size_name = "M0"
+  mongo_db_major_version = var.mongo_db_major_version
+  provider_region_name = "US_EAST_1" # Change as needed for free-tier supported regions
+}
+
+{% endif %}
 
 # Create a database admin user
 resource "mongodbatlas_database_user" "db_admin" {
