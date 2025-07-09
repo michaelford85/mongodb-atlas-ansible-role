@@ -181,8 +181,9 @@ localhost ansible_connection=local
 
 ##### requirements.yml
 
-Specifies the Ansible collections required by this project, ensuring all necessary modules and plugins are available. Install these dependencies with `ansible-galaxy collection install -r requirements.yml`.
+Specifies the Ansible collections required by this project, ensuring all necessary modules and plugins are available. Install these dependencies with `ansible-galaxy install -r requirements.yml`.
 ```
+---
 roles:
   - name: mongodb-atlas-ansible-role
     src: git+https://github.com/michaelford85/mongodb-atlas-ansible-role.git
@@ -214,6 +215,7 @@ connect_timeout = 200
 
 ##### create_cluster.yml
 ```
+---
 - hosts: localhost
   gather_facts: no
   vars:
@@ -236,12 +238,9 @@ connect_timeout = 200
         tasks_from: create-atlas-cluster
 ```
 
-This playbook will:
-- Render the Terraform templates with your variables.
-- Initialize and apply Terraform to create the MongoDB Atlas cluster.
-
 ##### destroy_cluster.yml
 ```
+---
 - hosts: localhost
   gather_facts: no
   vars:
@@ -264,6 +263,7 @@ This playbook will:
 
 ##### remove_tf_artifacts.yml
 ```
+---
 - hosts: localhost
   gather_facts: no
   vars:
