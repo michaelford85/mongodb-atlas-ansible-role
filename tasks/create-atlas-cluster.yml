@@ -7,14 +7,14 @@
 
 - name: Ensure Terraform cluster directory exists
   ansible.builtin.file:
-    path: "{{ base_dir }}/{{ atlas_cluster_name }}"
+    path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
     state: directory
     mode: '0755'
 
 - name: Render Terraform templates
   ansible.builtin.template:
     src: "{{ item }}"
-    dest: "{{ base_dir }}/{{ atlas_cluster_name }}/{{ item | basename }}"
+    dest: "{{ playbook_dir }}/{{ atlas_cluster_name }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
     mode: '0644'
   loop:
     - templates/main.tf.j2
@@ -24,11 +24,11 @@
 # - name: Initialize Terraform
 #   ansible.builtin.command:
 #     cmd: terraform init
-#     chdir: "{{ base_dir }}/terraform/{{ atlas_cluster_name }}"
+#     chdir: "{{ playbook_dir }}/terraform/{{ atlas_cluster_name }}"
 
 # - name: Create MongoDB Atlas cluster
 #   community.general.terraform:
-#     project_path: "{{ base_dir }}/terraform/{{ atlas_cluster_name }}"
+#     project_path: "{{ playbook_dir }}/terraform/{{ atlas_cluster_name }}"
 #     state: present
 #     variables:
 #       org_id: "{{ atlas_org_id }}"
