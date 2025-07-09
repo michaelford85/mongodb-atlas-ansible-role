@@ -2,17 +2,19 @@
 
 - name: Get all clusters in the Atlas project
   ansible.builtin.uri:
-    url: "https://cloud.mongodb.com/api/atlas/v2/groups/{{ atlas_project_id }}/clusters"
+    url: "https://cloud.mongodb.com/api/atlas/v1.0/groups/{{ atlas_project_id }}/clusters"
     method: GET
     user: "{{ vaulted_atlas_public_key }}"
     password: "{{ vaulted_atlas_private_key }}"
-    force_basic_auth: yes
+    force_basic_auth: no
     status_code: 200
     return_content: yes
+    headers:
+      Accept: "application/json"
   register: atlas_clusters
 
-- ansible.builtin.debug:
-    var: atlas_clusters 
+# - ansible.builtin.debug:
+#     var: atlas_clusters 
 
 - name: Fail if an M0 cluster already exists and we're trying to deploy another free cluster
   ansible.builtin.fail:
@@ -21,42 +23,42 @@
     deploy_free_cluster | bool and
     atlas_clusters.json.results | selectattr('providerSettings.instanceSizeName', 'equalto', 'M0') | list | length > 0
 
-# - name: Validate atlas_cluster_instance_size
-#   ansible.builtin.fail:
-#     msg: "atlas_cluster_instance_size must be between M10 and M80. Current value: {{ atlas_cluster_instance_size }}"
-#   when: atlas_cluster_instance_size not in ["M10", "M20", "M30", "M40", "M50", "M60", "M80"]
+- name: Validate atlas_cluster_instance_size
+  ansible.builtin.fail:
+    msg: "atlas_cluster_instance_size must be between M10 and M80. Current value: {{ atlas_cluster_instance_size }}"
+  when: atlas_cluster_instance_size not in ["M10", "M20", "M30", "M40", "M50", "M60", "M80"]
 
-# - name: Ensure Terraform cluster directory exists
-#   ansible.builtin.file:
-#     path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
-#     state: directory
-#     mode: '0755'
+- name: Ensure Terraform cluster directory exists
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+    state: directory
+    mode: '0755'
 
-# - name: Render Terraform templates
-#   ansible.builtin.template:
-#     src: "{{ item }}"
-#     dest: "{{ playbook_dir }}/{{ atlas_cluster_name }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
-#     mode: '0644'
-#   loop:
-#     - templates/main.tf.j2
-#     - templates/providers.tf.j2
-#     - templates/vars.tf.j2
+- name: Render Terraform templates
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "{{ playbook_dir }}/{{ atlas_cluster_name }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
+    mode: '0644'
+  loop:
+    - templates/main.tf.j2
+    - templates/providers.tf.j2
+    - templates/vars.tf.j2
 
-# - name: Initialize Terraform
-#   ansible.builtin.command:
-#     cmd: terraform init
-#     chdir: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+- name: Initialize Terraform
+  ansible.builtin.command:
+    cmd: terraform init
+    chdir: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
 
-# - name: Create MongoDB Atlas cluster
-#   community.general.terraform:
-#     project_path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
-#     state: present
-#     variables:
-#       org_id: "{{ atlas_org_id }}"
-#       mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
-#       mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
-#       project_name: "{{ atlas_project_name }}"
-#       cluster_name: "{{ atlas_cluster_name }}"
-#       instance_size: "{{ atlas_cluster_instance_size }}"
-#       db_password: "{{ db_password }}"
-#   register: terraform_output
+- name: Create MongoDB Atlas cluster
+  community.general.terraform:
+    project_path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+    state: present
+    variables:
+      org_id: "{{ atlas_org_id }}"
+      mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
+      mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
+      project_name: "{{ atlas_project_name }}"
+      cluster_name: "{{ atlas_cluster_name }}"
+      instance_size: "{{ atlas_cluster_instance_size }}"
+      db_password: "{{ db_password }}"
+  register: terraform_output
