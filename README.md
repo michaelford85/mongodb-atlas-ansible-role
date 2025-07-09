@@ -23,11 +23,7 @@ It enables you to use Ansible variables to control your MongoDB Atlas infrastruc
 
 - **Project-level API keys:**  
   - The API keys used must be created under the same Atlas project and have at least `Project Owner` permissions.
-    - See instructions on how to create API keys for your project [at this link](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-a-project).
-
----
-
-## 
+    - See instructions on how to create MongoDB Atlas API keys for your project [at this link](https://www.mongodb.com/docs/atlas/configure-api-access/#grant-programmatic-access-to-a-project).
 
 ___
 
@@ -43,7 +39,7 @@ Make sure you have the following installed:
 
 - [Ansible >= 2.9](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Terraform >= 1.0](https://developer.hashicorp.com/terraform/install)
-- Python packages for Ansible collections if required.
+- Python packages may be needed for Ansible collections. Check the collection pages on [Ansible Galaxy](https://galaxy.ansible.com/) to see which packages to install.
 
 #### Install Ansible mongodb-atlas-ansible-role Role and associated Collections
 
@@ -80,7 +76,7 @@ ansible-galaxy collection install ansible.posix:2.0.0
 
 ---
 
-### 2. Define your variables
+### 2. Define Role Variables
 Edit your `group_vars` or `vars` file with required parameters:
 
 ```yaml
@@ -97,6 +93,16 @@ atlas_project_name: "Test Project"
 ## Project Settings GUI page in MongoDB Atlas.
 atlas_project_id: 1234567890abcdef12345679
 
+## The MongoDB Atlas API Public Key. 
+## In practice, this should not be stored directly in a plaintext variable file. 
+## Store it in a separate file encrypted with Ansible Vault and reference it as shown here.
+vaulted_atlas_public_key: "abcd1234efgh5678ijkl"
+
+## The MongoDB Atlas API Private Key.
+## As with the public key, this should be stored securely in an encrypted file 
+## (for example using Ansible Vault) and not committed to source control.
+vaulted_atlas_private_key: "mnop9012qrst3456uvwx7890yzab1234"
+
 ## This is the the desired name of the cluster, and will also be incorporated into the
 ## database access usernames that will be generated.
 atlas_cluster_name: test-cluster
@@ -106,7 +112,9 @@ atlas_cluster_name: test-cluster
 atlas_cluster_instance_size: M10
 
 ## The password that will be assigned to all database access users that are generated.
-db_password: "SuperSecurePassword123!"
+## In practice, this should not be stored directly in a plaintext variable file. 
+## Store it in a separate file encrypted with Ansible Vault and reference it as shown here.
+vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
 ```
 
 ---
@@ -119,6 +127,20 @@ Here are some example playbooks for managing your Atlas cluster.
 ```
 - hosts: localhost
   gather_facts: no
+  vars:
+    atlas_org_id: 1234567890abcdef12345678
+    atlas_project_name: "Test Project"
+    atlas_project_id: 1234567890abcdef12345679
+    atlas_cluster_name: test-cluster
+    atlas_cluster_instance_size: M10
+    
+  ## An encrypted ansible variable file housing the variables:
+  ##  - vaulted_atlas_public_key
+  ##  - vaulted_atlas_private_key
+  ##  - vaulted_db_password
+  vars_files:
+    - ansible_vaulted_creds.yml
+
   tasks:
     - ansible.builtin.include_role:
         name: terraform
@@ -133,6 +155,17 @@ This playbook will:
 ```
 - hosts: localhost
   gather_facts: no
+  vars:
+    atlas_org_id: 1234567890abcdef12345678
+    atlas_project_name: "Test Project"
+    atlas_project_id: 1234567890abcdef12345679
+    atlas_cluster_name: test-cluster
+    
+  ## An encrypted ansible variable file housing the variables:
+  ##  - vaulted_atlas_public_key
+  ##  - vaulted_atlas_private_key
+  vars_files:
+    - ansible_vaulted_creds.yml
   tasks:
     - ansible.builtin.include_role:
         name: terraform
@@ -143,6 +176,11 @@ This playbook will:
 ```
 - hosts: localhost
   gather_facts: no
+  vars:
+    atlas_org_id: 1234567890abcdef12345678
+    atlas_project_name: "Test Project"
+    atlas_project_id: 1234567890abcdef12345679
+    atlas_cluster_name: test-cluster
   tasks:
     - ansible.builtin.include_role:
         name: terraform

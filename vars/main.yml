@@ -15,6 +15,16 @@ atlas_project_name: "Test Project"
 ## Project Settings GUI page in MongoDB Atlas.
 atlas_project_id: 1234567890abcdef12345679
 
+## The MongoDB Atlas API Public Key. 
+## In practice, this should not be stored directly in a plaintext variable file. 
+## Store it in a separate file encrypted with Ansible Vault and reference it as shown here.
+mongodb_atlas_public_key: "{{ vaulted_atlas_public_key }}"
+
+## The MongoDB Atlas API Private Key.
+## As with the public key, this should be stored securely in an encrypted file 
+## (for example using Ansible Vault) and not committed to source control.
+mongodb_atlas_private_key: "{{ vaulted_atlas_private_key }}"
+
 ## This is the the desired name of the cluster, and will also be incorporated into the
 ## database access usernames that will be generated.
 atlas_cluster_name: test-cluster
