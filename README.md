@@ -29,7 +29,7 @@ mongodb-atlas-ansible-role/
 │   ├── main.yml
 │   └── remove-terraform-artifacts.yml
 ├── templates/
-│   ├── main.tf,j2
+│   ├── main.tf.j2
 │   ├── providers.tf.j2
 │   └── vars.tf.j2
 ├── tests/
@@ -85,7 +85,7 @@ collections:
 ```
 
 You can then run the following command:
-`ansible-galaxy collection install -r requirements.yml`
+`ansible-galaxy install -r requirements.yml`
 
 ##### Individual collection installation
 
