@@ -1,0 +1,4 @@
+- name: Recursively delete Terraform files
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+    state: absent

@@ -133,17 +133,17 @@ Here are some example playbooks for managing your Atlas cluster.
     atlas_project_id: 1234567890abcdef12345679
     atlas_cluster_name: test-cluster
     atlas_cluster_instance_size: M10
-    
-  ## An encrypted ansible variable file housing the variables:
-  ##  - vaulted_atlas_public_key
-  ##  - vaulted_atlas_private_key
-  ##  - vaulted_db_password
+  
+  # An encrypted ansible variable file housing the variables:
+  #  - vaulted_atlas_public_key
+  #  - vaulted_atlas_private_key
+  #  - vaulted_db_password
   vars_files:
-    - ansible_vaulted_creds.yml
+    - atlas_creds.yml
 
   tasks:
     - ansible.builtin.include_role:
-        name: terraform
+        name: mongodb-atlas-ansible-role
         tasks_from: create-atlas-cluster
 ```
 
@@ -160,15 +160,16 @@ This playbook will:
     atlas_project_name: "Test Project"
     atlas_project_id: 1234567890abcdef12345679
     atlas_cluster_name: test-cluster
-    
-  ## An encrypted ansible variable file housing the variables:
-  ##  - vaulted_atlas_public_key
-  ##  - vaulted_atlas_private_key
+  
+  # An encrypted ansible variable file housing the variables:
+  #  - vaulted_atlas_public_key
+  #  - vaulted_atlas_private_key
   vars_files:
-    - ansible_vaulted_creds.yml
+    - atlas_creds.yml
+
   tasks:
     - ansible.builtin.include_role:
-        name: terraform
+        name: mongodb-atlas-ansible-role
         tasks_from: destroy-atlas-cluster
 ```
 
@@ -177,13 +178,11 @@ This playbook will:
 - hosts: localhost
   gather_facts: no
   vars:
-    atlas_org_id: 1234567890abcdef12345678
-    atlas_project_name: "Test Project"
-    atlas_project_id: 1234567890abcdef12345679
     atlas_cluster_name: test-cluster
+
   tasks:
     - ansible.builtin.include_role:
-        name: terraform
+        name: mongodb-atlas-ansible-role
         tasks_from: remove-terraform-artifacts
 ```
 
