@@ -63,6 +63,7 @@ Make sure you have the following installed:
 
 - [Ansible >= 2.9](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Terraform >= 1.0](https://developer.hashicorp.com/terraform/install)
+- [Mongo Shell](https://www.mongodb.com/docs/mongodb-shell/install/)
 - Python packages may be needed for Ansible collections. Check the collection pages on [Ansible Galaxy](https://galaxy.ansible.com/) to see which packages to install.
 
 #### Install Ansible mongodb-atlas-ansible-role Role and associated Collections
@@ -82,6 +83,8 @@ collections:
     version: 11.0.0
   - name: ansible.posix
     version: 2.0.0
+  - name: cloud.terraform
+    version: 3.1.0
 ```
 
 You can then run the following command:
@@ -204,6 +207,8 @@ collections:
     version: 11.0.0
   - name: ansible.posix
     version: 2.0.0
+  - name: cloud.terraform
+    version: 3.1.0
 ```
 
 ##### ansible.cfg
@@ -247,6 +252,41 @@ connect_timeout = 200
     - ansible.builtin.include_role:
         name: mongodb-atlas-ansible-role
         tasks_from: create-atlas-cluster
+```
+
+##### connect_to_cluster
+- This playbook retrieves the connection string for `mongosh` from the `terraform.tfstate` file, and generates a `connect.sh` bash script using the `{{ atlas_cluster_name }}-admin` for username, and  `vaulted_db_password` for password, in order to connect to your cluster with mongosh.
+
+```
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    atlas_cluster_name: test-cluster
+  
+  # An encrypted ansible variable file housing the variables:
+  #  - vaulted_db_password
+  vars_files:
+    - credentials/atlas_creds.yml
+
+  tasks:
+    - name: Read connection string from Terraform output
+      cloud.terraform.terraform_output:
+        project_path: "{{ playbook_dir }}/{{ atlas_cluster_name }}"
+        state_file: "{{ playbook_dir }}/{{ atlas_cluster_name }}/terraform.tfstate"
+      register: tf_output
+
+    - name: Debug connection string
+      ansible.builtin.debug:
+        var: tf_output.outputs.mongodb_connection_string.value.standard_srv
+
+    - name: Create a local script to connect with mongosh
+      ansible.builtin.copy:
+        dest: "./connect.sh"
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          mongosh "{{ tf_output.outputs.mongodb_connection_string.value.standard_srv }}" -u "{{ atlas_cluster_name }}-admin" -p "{{ db_password }}"
 ```
 
 ##### destroy_cluster.yml
