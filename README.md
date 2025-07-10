@@ -1,7 +1,12 @@
 
 # MongoDB Atlas Ansible Role
 
-This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision and destroy MongoDB Atlas clusters.
+
+<p align="center">
+  <img src="images/ansible_tf_atlas.png" alt="Ansible to Terraform to Atlas flow" width="80%">
+</p>
+
+This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision and destroy [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database) Database clusters.
 
 It enables you to use Ansible variables to control your MongoDB Atlas infrastructure, combining the simplicity of Ansible with the power of Terraform for managing cloud resources.
 
