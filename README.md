@@ -6,7 +6,7 @@
   <img src="images/ansible_tf_atlas.png" alt="Ansible to Terraform to Atlas flow" width="80%">
 </p>
 
-This repository contains an Ansible playbook and role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision and destroy [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database) Database clusters.
+This repository contains an Ansible role that dynamically generates Terraform configuration files using Jinja2 templates, and then applies them to provision and destroy [MongoDB Atlas](https://www.mongodb.com/products/platform/atlas-database) Database clusters.
 
 It enables you to use Ansible variables to control your MongoDB Atlas infrastructure, combining the simplicity of Ansible with the power of Terraform for managing cloud resources.
 
@@ -143,6 +143,10 @@ atlas_cluster_name: test-cluster
 ## It can range from M10 to M80.
 atlas_cluster_instance_size: M10
 
+## Set to true to load the MongoDB Atlas sample datasets into the newly created cluster.
+## This can be helpful for initial exploration or development environments.
+load_sample_data: false
+
 ## Set to true to deploy an M0 free cluster. 
 ## This will automatically override the instance size to M0 and ignore other advanced cluster settings.
 ## The role includes a safeguard that checks if an M0 already exists in the project and fails early if so.
@@ -245,6 +249,7 @@ connect_timeout = 200
     atlas_cluster_name: test-cluster
     atlas_cluster_instance_size: M10
     deploy_free_cluster: false  # Set to true to deploy a free M0 cluster
+    load_sample_data: true
   
   # An encrypted ansible variable file housing the variables:
   #  - vaulted_atlas_public_key
@@ -257,6 +262,12 @@ connect_timeout = 200
     - ansible.builtin.include_role:
         name: mongodb-atlas-ansible-role
         tasks_from: create-atlas-cluster
+
+    
+    - ansible.builtin.include_role:
+        name: mongodb-atlas-ansible-role
+        tasks_from: load-sample-data
+      when: load_sample_data
 ```
 
 ##### connect_to_cluster
