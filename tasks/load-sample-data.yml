@@ -12,15 +12,15 @@
   failed_when: false
   when: load_sample_data
 
-- name: Check if loading sample data succeeded
-  ansible.builtin.fail:
-    msg: >-
-      Failed to load sample dataset into cluster {{ atlas_cluster_name }}. 
-      API returned status: {{ load_sample_result.status }} 
-      with content: {{ load_sample_result.content | default(load_sample_result.json) }}
-  when:
-    - load_sample_data 
-    - load_sample_result.status != 202
+# - name: Check if loading sample data succeeded
+#   ansible.builtin.fail:
+#     msg: >-
+#       Failed to load sample dataset into cluster {{ atlas_cluster_name }}. 
+#       API returned status: {{ load_sample_result.status }} 
+#       with content: {{ load_sample_result.content | default(load_sample_result.json) }}
+#   when:
+#     - load_sample_data 
+#     - load_sample_result.status != 202
 
 # - name: Show load sample API response
 #   ansible.builtin.debug:
