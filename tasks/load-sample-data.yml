@@ -1,0 +1,36 @@
+- name: Load sample dataset into MongoDB Atlas cluster using curl
+  ansible.builtin.shell: |
+    curl --user "{{ vaulted_atlas_public_key }}:{{ vaulted_atlas_private_key }}" \
+      --digest \
+      -H "Accept: application/vnd.atlas.2025-03-12+json" \
+      -H "Content-Type: application/json" \
+      -X POST \
+      -d '{}' \
+      "https://cloud.mongodb.com/api/atlas/v2/groups/{{ atlas_project_id }}/sampleDatasetLoad/{{ atlas_cluster_name }}"
+  register: load_sample_result
+  changed_when: "'state' in load_sample_result.stdout"
+  failed_when: "'Unauthorized' in load_sample_result.stdout"
+  when: load_sample_data
+
+- name: Fail gracefully if sample data is already loading
+  ansible.builtin.fail:
+    msg: >-
+      Sample data load is already in progress for cluster {{ atlas_cluster_name }}.
+      MongoDB Atlas only allows one load request at a time.
+  when: load_sample_data and
+        '"SAMPLE_DATASET_LOAD_IN_PROGRESS"' in load_sample_result.stdout
+
+- name: Fail gracefully if sample data load failed unexpectedly
+  ansible.builtin.fail:
+    msg: >-
+      Sample data load request failed. Response was:
+      {{ load_sample_result.stdout }}
+  when: load_sample_data and
+        ('"state"' not in load_sample_result.stdout and
+         '"SAMPLE_DATASET_LOAD_IN_PROGRESS"' not in load_sample_result.stdout and
+         '"Unauthorized"' not in load_sample_result.stdout)
+
+- name: Show successful sample dataset load response
+  ansible.builtin.debug:
+    msg: "Sample dataset load request submitted successfully. Response: {{ load_sample_result.stdout }}"
+  when: load_sample_data and '"state"' in load_sample_result.stdout

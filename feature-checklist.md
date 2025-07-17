@@ -7,11 +7,14 @@ Follow this checklist to progressively enhance the role with new features.
 
 ## ✅ Enhancement checklist
 
-- [ ] **Free vs paid cluster toggle**
+- [x] **Free vs paid cluster toggle**
   - Add `atlas_cluster_instance_size` defaulted to `M10` in `defaults/main.yml`.
-  - Allow users to specify `M0` to deploy a free cluster.
-  - Adjust validation to allow `M0` when `deploy_free_cluster: true` is set.
+  - Allow users to specify `deploy_free_cluster: true` to deploy a free cluster.
+    - Ignore all other options when `deploy_free_cluster: true`
   - Document example usage in README.
+
+- [] **Cost Estimation**
+  - For a paid cluster, add a dry run option to estimate the costs per month for an Atlas Cluster with the chosen options.
 
 - [ ] **Option to skip creating default database users**
   - Add `create_default_db_user: true` to `defaults/main.yml`.
