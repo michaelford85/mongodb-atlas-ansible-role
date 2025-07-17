@@ -381,6 +381,7 @@ ansible-playbook remove-tf-artifacts.yml
   - Enable or disable **cloud backup** and **continuous cloud backup** options.
   - Support for **sharded cluster deployments**, including setting number of shards and configuration servers.
   - Ability to set **cluster tags** for organizational or billing purposes.
+- Add a dry run option to estimate the costs per month for an Atlas Cluster with the chosen options.
 
 The goal is to allow this role to act as a comprehensive interface for creating any MongoDB Atlas cluster configuration supported by the Terraform provider, fully managed through Ansible variables.
 
