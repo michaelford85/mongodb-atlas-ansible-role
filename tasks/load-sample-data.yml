@@ -1,12 +1,25 @@
 
+# - name: Load sample dataset into MongoDB Atlas cluster
+#   ansible.builtin.uri:
+#     url: "https://cloud.mongodb.com/api/atlas/v1.0/groups/{{ atlas_project_id }}/sampleDatasetLoad/{{ atlas_cluster_name }}"
+#     method: POST
+#     user: "{{ vaulted_atlas_public_key }}"
+#     password: "{{ vaulted_atlas_private_key }}"
+#     force_basic_auth: yes
+#     status_code: 202
+#     return_content: yes
+#   register: load_sample_result
+#   failed_when: false
+#   when: load_sample_data
+
 - name: Load sample dataset into MongoDB Atlas cluster
   ansible.builtin.uri:
-    url: "https://cloud.mongodb.com/api/atlas/v1.0/groups/{{ atlas_project_id }}/sampleDatasetLoad/{{ atlas_cluster_name }}"
+    url: "https://cloud.mongodb.com/api/atlas/v2/groups/{{ atlas_project_id }}/sampleDatasetLoad/{{ atlas_cluster_name }}"
     method: POST
     user: "{{ vaulted_atlas_public_key }}"
     password: "{{ vaulted_atlas_private_key }}"
     force_basic_auth: yes
-    status_code: 202
+    status_code: 201
     return_content: yes
   register: load_sample_result
   failed_when: false
