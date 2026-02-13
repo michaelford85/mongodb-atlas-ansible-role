@@ -44,3 +44,6 @@ load_sample_data: false
 
 ## The password that will be assigned to all database access users that are generated.
 db_password: "SuperSecurePassword123!"
+
+## The version of the Terraform Atlas provider to use when connecting to the cluster with Terraform.
+tf_atlas_provider_version: 2.5.0

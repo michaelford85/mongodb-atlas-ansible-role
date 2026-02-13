@@ -156,6 +156,9 @@ deploy_free_cluster: false
 ## In practice, this should not be stored directly in a plaintext variable file. 
 ## Store it in a separate file encrypted with Ansible Vault and reference it as shown here.
 vaulted_db_password: "S3cur3P@ssw0rd!XyZ789"
+
+## The version of the Terraform Atlas provider to use when connecting to the cluster with Terraform.
+tf_atlas_provider_version: 2.5.0
 ```
 
 ---
@@ -270,7 +273,7 @@ connect_timeout = 200
       when: load_sample_data
 ```
 
-##### connect_to_cluster
+##### connect_to_cluster.yml
 - This playbook retrieves the connection string for `mongosh` from the `terraform.tfstate` file, and generates a `connect.sh` bash script using the `{{ atlas_cluster_name }}-admin` for username, and  `vaulted_db_password` for password, in order to connect to your cluster with mongosh.
 
 ```
